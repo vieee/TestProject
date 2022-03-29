@@ -8,8 +8,13 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.DriveCommand;
+import frc.robot.commands.IndexingCommand;
+import frc.robot.commands.IntakeCommand;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.IndexingSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -23,17 +28,21 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private DriveSubsystem driveSubsystem;
+  private IntakeSubsystem intakeSubsystem;
+  private IndexingSubsystem indexingSubsystem;
 
-  private Joystick joyDriving;
+  public static Joystick joyDriving;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   // () -> {}
   public RobotContainer() {
-    this.joyDriving = new Joystick(0);
+    RobotContainer.joyDriving = new Joystick(0);
 
     this.driveSubsystem = new DriveSubsystem();
+    this.intakeSubsystem = new IntakeSubsystem();
+    this.indexingSubsystem = new IndexingSubsystem();
 
     this.driveSubsystem.setDefaultCommand(
         new DriveCommand(this.driveSubsystem, () -> joyDriving.getRawAxis(1), () -> joyDriving.getRawAxis(4)));
@@ -50,6 +59,13 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    // Intake Button Binding
+    new JoystickButton(RobotContainer.joyDriving, Constants.intakeButton_JoyDriving_4)
+        .toggleWhenActive(new IntakeCommand(this.intakeSubsystem));
+
+    // Indexing Button Binding
+    new JoystickButton(RobotContainer.joyDriving, Constants.indexingButton_JoyDriving_5)
+        .toggleWhenActive(new IndexingCommand(this.indexingSubsystem));
   }
 
   /**
