@@ -7,23 +7,16 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class ShooterSubsystem extends SubsystemBase {
-  private CANSparkMax lowerWheels;
-  private CANSparkMax upperWheelsLeft;
-  private CANSparkMax upperWheelsRight;
-
-  private MotorControllerGroup upperWheels;
+  private CANSparkMax shooter;
 
   /** Creates a new ShooterSubsystem. */
   public ShooterSubsystem() {
-    this.lowerWheels = new CANSparkMax(10, MotorType.kBrushless);
-
-    this.upperWheelsLeft = new CANSparkMax(11, MotorType.kBrushless);
-    this.upperWheelsRight = new CANSparkMax(12, MotorType.kBrushless);
-    this.upperWheels = new MotorControllerGroup(this.upperWheelsLeft, this.upperWheelsRight);
+    this.shooter = new CANSparkMax(10, MotorType.kBrushless);
   }
 
   @Override
@@ -32,7 +25,24 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public void setSpeeds(double speed) {
-    this.lowerWheels.set(speed);
-    this.upperWheels.set(speed);
+    double currentSpeed = this.shooter.get();
+    if (currentSpeed > Constants.shooterSpeedDeadband) {
+      // The Motor is Moving
+      this.shooter.set(0.0);
+    } else {
+      // The Motor was not moving
+      double now = Timer.getFPGATimestamp();
+      while (now < 0.6) {
+        if (now < 0.2)
+          this.shooter.set(Constants.intakeSpeedMax / 3);
+        else if (now < 0.4)
+          this.shooter.set(Constants.intakeSpeedMax / 2);
+      }
+      this.shooter.set(Constants.intakeSpeedMax);
+    }
+  }
+
+  public void setAutonomousSpeed(double speed) {
+    this.shooter.set(speed);
   }
 }

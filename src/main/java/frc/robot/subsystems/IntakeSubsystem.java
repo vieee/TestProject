@@ -13,10 +13,12 @@ import frc.robot.Constants;
 
 public class IntakeSubsystem extends SubsystemBase {
   private CANSparkMax intake;
+  private CANSparkMax intakeOpening;
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
     this.intake = new CANSparkMax(3, MotorType.kBrushless);
+    this.intakeOpening = new CANSparkMax(46, MotorType.kBrushed);
   }
 
   @Override
@@ -44,5 +46,9 @@ public class IntakeSubsystem extends SubsystemBase {
       this.intake.set(Constants.intakeSpeedMax);
     }
 
+  }
+
+  public void setIntakeOpeningSpeed(double speed) {
+    this.intakeOpening.set(speed);
   }
 }

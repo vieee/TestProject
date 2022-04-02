@@ -10,9 +10,14 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.IndexingCommand;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.IntakeOpeningCommand;
+import frc.robot.commands.ShooterDirectCommand;
+import frc.robot.commands.ShooterFarawayCommand;
+import frc.robot.commands.autonomous.AutonomousParallelGroupCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IndexingSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -30,6 +35,7 @@ public class RobotContainer {
   private DriveSubsystem driveSubsystem;
   private IntakeSubsystem intakeSubsystem;
   private IndexingSubsystem indexingSubsystem;
+  private ShooterSubsystem shooterSubsystem;
 
   public static Joystick joyDriving;
 
@@ -43,9 +49,13 @@ public class RobotContainer {
     this.driveSubsystem = new DriveSubsystem();
     this.intakeSubsystem = new IntakeSubsystem();
     this.indexingSubsystem = new IndexingSubsystem();
+    this.shooterSubsystem = new ShooterSubsystem();
 
     this.driveSubsystem.setDefaultCommand(
         new DriveCommand(this.driveSubsystem, () -> joyDriving.getRawAxis(1), () -> joyDriving.getRawAxis(4)));
+
+    this.intakeSubsystem.setDefaultCommand(
+        new IntakeOpeningCommand(this.intakeSubsystem, () -> joyDriving.getRawAxis(5)));
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -66,6 +76,14 @@ public class RobotContainer {
     // Indexing Button Binding
     new JoystickButton(RobotContainer.joyDriving, Constants.indexingButton_JoyDriving_5)
         .toggleWhenActive(new IndexingCommand(this.indexingSubsystem));
+
+    // Shooter Direct Speed Binding
+    new JoystickButton(RobotContainer.joyDriving, Constants.shootingButton_JoyDriving_6)
+        .whenActive(new ShooterDirectCommand(this.shooterSubsystem));
+
+    // Shooter Faraway Speed Binding
+    new JoystickButton(RobotContainer.joyDriving, Constants.shootingFarawayButton_JoyDriving_7)
+        .whenActive(new ShooterFarawayCommand(this.shooterSubsystem));
   }
 
   /**
@@ -75,6 +93,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return null;
+    return new AutonomousParallelGroupCommand(this.shooterSubsystem, this.driveSubsystem, this.indexingSubsystem);
   }
+
 }

@@ -43,5 +43,11 @@ public class IndexingSubsystem extends SubsystemBase {
       this.indexing.set(Constants.indexingSpeedMax);
     }
 
+    
+  }
+
+  
+  public void setAutonomousSpeed(double speed) {
+    this.indexing.set(speed);
   }
 }
